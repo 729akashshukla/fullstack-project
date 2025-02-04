@@ -1,12 +1,10 @@
-export const getProfile = (req, res) => {
-    res.json({ message: "Welcome to your profile", user: req.session.user });
-  };
-  
-  export const adminPanel = (req, res) => {
-    res.json({ message: "Welcome Admin!" });
-  };
-  
-  export const managerPanel = (req, res) => {
-    res.json({ message: "Welcome Manager!" });
-  };
-  
+import User from "../models/User.js";
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};

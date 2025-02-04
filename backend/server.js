@@ -1,34 +1,45 @@
 import express from "express";
 import dotenv from "dotenv";
+import session from "express-session";
+import passport from "passport";
 import cors from "cors";
-import connectDB from './src/config/db.js';
-import sessionConfig from "./src/config/sessionConfig.js";
-import authRoutes from "./src/routes/authRoutes.js";
-import userRoutes from "./src/routes/userRoutes.js";
+import "./config/db.js"; // Connect MongoDB
+import "./config/passport.js"; // Initialize Passport
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
-connectDB();
 
 const app = express();
+
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(express.static("public"));
-app.use(sessionConfig);
-app.use(cors({
-    origin: "*",
-}))
 
-// Routes
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes);
+app.use("/api/users", userRoutes);
 
-// Start Server
+app.listen(8000, () => console.log("Server running on port 8000"));
 
 
-
-app.get("/", (req, res) => {
-    return res.json({message:"Hello i am working fine"});
-});
-
-const PORT = process.env.PORT || 4000 ;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// const app = express();
+// app.use(express.json());
+// app.use(express.urlencoded({extended: false}));
+// app.use(express.static("public"));
+// app.use(sessionConfig);
+// app.use(cors({
+//     origin: "*",
+// }))
+// app.get("/", (req, res) => {
+//     return res.json({message:"Hello i am working fine"});
+// });
